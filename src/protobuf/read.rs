@@ -1,16 +1,19 @@
 use crate::protobuf::BufReader;
+use std::net::TcpStream;
 use std::fmt::Write;
+use std::borrow::Borrow;
+use std::io::Read;
 
-impl BufReader{
+impl BufReader {
     pub fn byte(&mut self) -> u8 {
-        self.iterator += 1;
-        self.data[self.iterator - 1]
+        let mut res: [u8; 1] = [0];
+        self.data.read_exact(&mut res).unwrap();
+        res[0]
     }
 
     pub fn ushort(&mut self) -> u16 {
-        self.iterator += 2;
-        let mut number = ((self.data[self.iterator - 2]) as u16) << 8;
-        number += self.data[self.iterator - 1] as u16;
+        let mut number = (self.byte() as u16) << 8;
+        number += self.byte() as u16;
         number
     }
 
@@ -43,5 +46,9 @@ impl BufReader{
             res.write_char(self.byte() as char).unwrap();
         }
         res
+    }
+
+    pub fn get_stream(&mut self) -> &TcpStream {
+        self.data.borrow()
     }
 }

@@ -31,4 +31,8 @@ impl BufWriter {
             self.byte(letter as u8);
         }
     }
+
+    pub fn concat(&mut self, buf: &mut Vec<u8>) {
+        self.data.append(buf);
+    }
 }
